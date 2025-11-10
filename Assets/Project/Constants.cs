@@ -8,15 +8,20 @@ namespace Game.Project
     {
         public const string MAIN_MENU_SCENE_NAME = "MainMenuScene";
         public const string LEVEL_SCENE_NAME = "LevelScene";
-        public const string ALPHA_RATIO_PROPERTY = "_AlphaRatio";
-        public const string ALPHA_THRESHOLD_PROPERTY = "_AlphaClipping";
-        public const string SHOW_EFFECT_PROPERTY = "_ShowEffect";
-        public const string COLOR_PROPERTY = "_Color";
         public const string MUSIC_VOLUME = "musicVol";
         public const string SFX_VOLUME = "sfxVol";
 
-        public const string PLAYER_MOVE_INPUT = "move_input";
+        public const string IS_IDLE_ANIM_PARAM = "is_idle";
 
-        public const float DEFAULT_RADIUS = 0.5f;
+        public const string IDLE_X_ANIM_PARAM = "idle_x";
+        public const string IDLE_Y_ANIM_PARAM = "idle_y";
+        
+        public const string MOVE_X_ANIM_PARAM = "move_x";
+        public const string MOVE_Y_ANIM_PARAM = "move_y";
+
+
+        
+        public const float MOVEMENT_DRAG = 5.0f;
+        public const float MOVEMENT_ANGULAR_DRAG = 10.0f;
     }
 }

@@ -12,25 +12,33 @@ namespace Game.Utils.Core
 
         public Action OnPausePressed;
         public Action OnInteractPressed;
+        public Action OnFirePressed;
         
         private PlayerInputActions playerInputActions;
         private Vector2 currentLookDelta = Vector2.zero;
 
         public Camera LookCamera { get => Camera.main; }
 
-        public Vector2 GetSmoothLookDelta()
+        public Vector2 GetSmoothLookDirection()
         {
-            Vector2 targetLookDelta = GetLookDelta();
+            Vector2 targetLookDelta = GetLookDirection();
             currentLookDelta.x = Mathf.Lerp(currentLookDelta.x, targetLookDelta.x, lookSpeed.x * Time.deltaTime);
             currentLookDelta.y = Mathf.Lerp(currentLookDelta.y, targetLookDelta.y, lookSpeed.y * Time.deltaTime);
             return currentLookDelta;
         }
-        public Vector2 GetLookDelta()
+        public Vector2 GetLookDirection()
         {
             Vector2 centreOfScreen = new Vector2(Screen.width/2.0f, Screen.height/2.0f);
             Vector2 lookDelta = playerInputActions.Player.Look.ReadValue<Vector2>() - centreOfScreen;
             return lookDelta;
         }
+
+        public Vector2 GetLookPosition()
+        {
+            return playerInputActions.Player.Look.ReadValue<Vector2>();
+        }
+
+
         public Vector2 GetMovementInputNormalized()
         {
             return GetMovementInput().normalized;
@@ -49,7 +57,12 @@ namespace Game.Utils.Core
         {
             OnInteractPressed?.Invoke();
         }
-        
+
+        private void OnFirePress(InputAction.CallbackContext context)
+        {
+            OnFirePressed?.Invoke();
+        }
+
         private void Awake() 
         {
             playerInputActions = new PlayerInputActions();
@@ -63,15 +76,19 @@ namespace Game.Utils.Core
             playerInputActions.Player.Interact.Enable();
             playerInputActions.Player.Interact.started += OnInteraction;
             playerInputActions.Player.PauseToggle.started += OnPausePress;
+            playerInputActions.Player.Fire.started += OnFirePress;
         }
+
+        
 
         private void OnDestroy() 
         {
             playerInputActions.Disable();
-            
             playerInputActions.Player.Interact.Disable();
             playerInputActions.Player.Interact.started -= OnInteraction;
             playerInputActions.Player.PauseToggle.started -= OnPausePress;
+            playerInputActions.Player.Fire.started -= OnFirePress;
+
         }
     }
 }

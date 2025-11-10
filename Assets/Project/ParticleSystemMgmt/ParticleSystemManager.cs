@@ -7,7 +7,7 @@ namespace Game.Project.ParticleSystemMgmt
 {
     public class ParticleSystemManager : MonoBehaviour
     {
-        [SerializeField]private ParticleSystemData[] initializeData;
+        [SerializeField]private ParticleSystemData[] dataToInitialize;
         
         private Dictionary<ParticleSystemType, ObjectPool<ParticleSystemHandler>> particlePools;
         
@@ -22,8 +22,6 @@ namespace Game.Project.ParticleSystemMgmt
             {
                 particle.SetPool(pool);
             }
-
-            activeParticles.Add(particle);
             particle.transform.position = position;
             particle.Play();
         }
@@ -65,6 +63,31 @@ namespace Game.Project.ParticleSystemMgmt
             }
         }
 
+        private ParticleSystemHandler CreateParticle(ParticleSystemHandler prefab)
+        {
+            var instance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            instance.transform.parent = transform;
+            instance.gameObject.SetActive(false);
+            return instance;
+        }
+
+        private void OnParticleGet(ParticleSystemHandler handler)
+        {
+            handler.gameObject.SetActive(true);
+            activeParticles.Add(handler);
+        }
+
+        private void OnParticleReturn(ParticleSystemHandler handler)
+        {
+            handler.gameObject.SetActive(false);
+            activeParticles.Remove(handler);
+        }
+
+        private void OnParticleDestroy(ParticleSystemHandler handler)
+        {
+            Destroy(handler.gameObject);
+        }
+
         private void Awake()
         {
             particlePools = new Dictionary<ParticleSystemType, ObjectPool<ParticleSystemHandler>>();
@@ -81,6 +104,15 @@ namespace Game.Project.ParticleSystemMgmt
             if(stateManager != null)
             {
                 stateManager.OnGameStateChanged.AddListener(HandleParticleState);
+            }
+
+            if(particlePools.Count == 0)
+            {
+                foreach(var data in dataToInitialize)
+                {
+                    var pool = new ObjectPool<ParticleSystemHandler>(()=> CreateParticle(data.particleSystem), OnParticleGet, OnParticleReturn, OnParticleDestroy, data.count);
+                    particlePools.Add(data.type, pool);
+                }
             }
             //GameStateManager.Instance.OnGameStateChanged.AddListener(HandleParticleState);
         }
